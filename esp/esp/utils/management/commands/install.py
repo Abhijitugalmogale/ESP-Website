@@ -34,7 +34,7 @@ Learning Unlimited, Inc.
 """
 
 from django.core.management.base import BaseCommand
-from django.db.models import get_apps
+from django.apps import apps
 
 class Command(BaseCommand):
     """Install initial data on all apps.
@@ -42,7 +42,7 @@ class Command(BaseCommand):
     Call app.models.install() on all apps that have such a function.
     """
     def handle(self, *args, **options):
-        # get_apps() returns a list of the app.models modules of all
-        # installed apps.
-        for app in [app for app in get_apps() if hasattr(app, 'install')]:
-            app.install()
+        for app_config in apps.get_app_configs():
+            app = app_config.models_module
+            if app and hasattr(app, 'install'):
+                app.install()
